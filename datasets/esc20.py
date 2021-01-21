@@ -151,8 +151,8 @@ class ESC:
 
     def __download(self):
 
-        #if self.__check_exists():
-        #    return
+        if self.__check_exists():
+            return
 
         #self.__makedir_exist_ok(self.raw_folder)
         self.__makedir_exist_ok(self.processed_folder)
@@ -273,6 +273,8 @@ class ESC:
         print('\n')
         initial_new_class_label = len(self.class_dict)
         new_class_label = initial_new_class_label
+        
+        w=tuple()
         for c in self.classes:
             if c not in self.class_dict.keys():
                 print('Class is not in the data: %s' % c)
@@ -280,16 +282,29 @@ class ESC:
             # else:
             print('Class %s, %d' % (c, self.class_dict[c]))
             num_elems = (self.targets == self.class_dict[c]).cpu().sum()
+            w += (int(num_elems),)
             print('Number of elements in class %s: %d' % (c, num_elems))
             self.targets[(self.targets == self.class_dict[c])] = new_class_label
             new_class_label += 1
 
         num_elems = (self.targets < initial_new_class_label).cpu().sum()
+        w += (int(num_elems),)
         print('Number of elements in class unknown: %d' % (num_elems))
         self.targets[(self.targets < initial_new_class_label)] = new_class_label
         self.targets -= initial_new_class_label
         print(np.unique(self.targets.data.cpu()))
         print('\n')
+        
+        temp = np.unique(self.targets.data.cpu())
+        print(temp)
+        if self.d_type == 'train':
+            print('initial dataset weights:')
+            print(datasets[1]['weight'])
+            # print(w)
+            ww = tuple([min(w)/z for z in w])
+            datasets[1]['weight'] = ww
+        print('dataset weights:')
+        print(datasets[1]['weight'])
 
     def __len__(self):
         return len(self.data)
@@ -526,17 +541,18 @@ def ESC_get_datasets(data, load_train=True, load_test=True, num_classes=6):
         classes = ['101-Dog', '102-Rooster', '105-Frog', '106-Cat', '108-Insects', '109-Sheep']
     elif num_classes == 20:
         classes = ['101-Dog', '102-Rooster', '105-Frog', '106-Cat',
-                   '202-SeaWaves', '207-Wind', '206-WaterDrops', '210-Thunderstorm',
-				   '301-CryingBbaby', '302-Sneezing', '305-Coughing', '309-Snoring',
-				   '401-DoorKnock', '406-WashingMachine', '408-ClockAlarm', '410-GlassBreaking',
-				   '501-Helicopter', '503-Siren', '507-ChurchBells',  '508-Airplane']				   
+                   '205-ChirpingBirds', '206-WaterDrops', '210-Thunderstorm', '209-ToiletFlush',
+				           '301-CryingBbaby', '302-Sneezing', '305-Coughing', '307-Laughing',
+				           '401-DoorKnock', '406-WashingMachine', '408-ClockAlarm', '410-GlassBreaking',
+				           '501-Helicopter', '503-Siren', '507-ChurchBells',  '509-Fireworks']				   
     else:
         raise ValueError(f'Unsupported num_classes {num_classes}')
 
-    augmentation = {'aug_num': 2}
+    augmentation = {'aug_num': 5}
     quantization_scheme = {'compand': False, 'mu': 10}
 
     if load_train:
+        print('load train')
         train_dataset = ESC(root=data_dir, classes=classes, d_type='train',
                             transform=transform, t_type='keyword',
                             quantization_scheme=quantization_scheme,
@@ -545,6 +561,7 @@ def ESC_get_datasets(data, load_train=True, load_test=True, num_classes=6):
         train_dataset = None
 
     if load_test:
+        print('load test')
         test_dataset = ESC(root=data_dir, classes=classes, d_type='test',
                            transform=transform, t_type='keyword',
                            quantization_scheme=quantization_scheme,
