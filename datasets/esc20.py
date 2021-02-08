@@ -63,18 +63,33 @@ class ESC:
     """
 
     url = 'http://download.tensorflow.org/data/speech_commands_v0.02.tar.gz' # TODO update
+    
     fs = 16000
-
-    class_dict = {'101-Dog': 0,       '201-Rain': 10,              '301-CryingBbaby': 20,     '401-DoorKnock': 30,         '501-Helicopter': 40,    
-                  '102-Rooster': 1,   '202-SeaWaves': 11,          '302-Sneezing': 21,        '402-MouseClick' :32,        '502-Chainsaw': 41,
-                  '103-Pig': 2,       '203-CracklingFire': 12,     '303-Clapping': 22,        '403-KeyboardTyping' :32,    '503-Siren': 42,
-                  '104-Cow': 3,       '204-Crickets': 13,          '304-Breathing': 23,       '404-DoorWoodCreaks': 33,    '504-CarHorn': 43,
-                  '105-Frog': 4,      '205-ChirpingBirds': 14,     '305-Coughing': 24,        '405-CanOpening': 34,        '505-Engine': 44,
-                  '106-Cat': 5,       '206-WaterDrops': 15,        '306-Footsteps': 25,       '406-WashingMachine': 35,    '506-Train': 45,
-                  '107-Hen': 6,       '207-Wind': 16,              '307-Laughing': 26,        '407-VacuumCleaner': 36,     '507-ChurchBells': 46,
-                  '108-Insects': 7,   '208-PouringWater': 17,      '308-BrushingTeeth': 27,   '408-ClockAlarm': 37,        '508-Airplane': 47,
-                  '109-Sheep': 8,     '209-ToiletFlush': 18,       '309-Snoring': 28,         '409-Clocktick': 38,         '509-Fireworks': 48,
-                  '110-Crow': 9,      '210-Thunderstorm': 19,      '310-Drinking': 29,        '410-GlassBreaking': 39,     '510-HandSaw': 49}
+    
+    # testing 8khz
+    #fs = 8000
+    
+   # class_dict_50 = {'101 - Dog': 0,       '201 - Rain': 10,              '301 - Crying baby': 20,     '401 - Door knock': 30,         '501 - Helicopter': 40,    
+   #               '102 - Rooster': 1,   '202 - Sea waves': 11,         '302 - Sneezing': 21,        '402 - Mouse click' :32,        '502 - Chainsaw': 41,
+   #               '103 - Pig': 2,       '203 - Crackling fire': 12,    '303 - Clapping': 22,        '403 - Keyboard typing' :32,    '503 - Siren': 42,
+   #               '104 - Cow': 3,       '204 - Crickets': 13,          '304 - Breathing': 23,       '404 - Door - wood creaks': 33, '504 - Car horn': 43,
+   #               '105 - Frog': 4,      '205 - Chirping birds': 14,    '305 - Coughing': 24,        '405 - Can opening': 34,        '505 - Engine': 44,
+   #               '106 - Cat': 5,       '206 - Water drops': 15,       '306 - Footsteps': 25,       '406 - Washing machine': 35,    '506 - Train': 45,
+   #               '107 - Hen': 6,       '207 - Wind': 16,              '307 - Laughing': 26,        '407 - Vacuum cleaner': 36,     '507 - Church bells': 46,
+   #               '108 - Insects': 7,   '208 - Pouring water': 17,     '308 - Brushing teeth': 27,  '408 - Clock alarm': 37,        '508 - Airplane': 47,
+   #               '109 - Sheep': 8,     '209 - Toilet flush': 18,      '309 - Snoring': 28,         '409 - Clock tick': 38,         '509 - Fireworks': 48,
+   #               '110 - Crow': 9,      '210 - Thunderstorm': 19,      '310 - Drinking': 29,        '410 - Glass breaking': 39,     '510 - Hand saw': 49}
+    
+    class_dict = {'101 - Dog': 0,                                     '301 - Crying baby': 15,     '401 - Door knock': 23,          
+                  '102 - Rooster': 1,                                 '302 - Sneezing': 16,        '402 - Mouse click' :24,       
+                  '103 - Pig': 2,                                     '303 - Clapping': 17,        '403 - Keyboard typing' :25,    '503 - Siren': 29,
+                  '104 - Cow': 3,       '204 - Crickets': 10,                                      '404 - Door - wood creaks': 26, '504 - Car horn': 30,
+                  '105 - Frog': 4,      '205 - Chirping birds': 11,   '305 - Coughing': 18,                                        
+                  '106 - Cat': 5,       '206 - Water drops': 12,                                                                      
+                  '107 - Hen': 6,                                     '307 - Laughing': 19,                                         '507 - Church bells': 31,
+                  '108 - Insects': 7,   '208 - Pouring water': 13,    '308 - Brushing teeth': 20,  '408 - Clock alarm': 27,         '508 - Airplane': 32,
+                  '109 - Sheep': 8,                                   '309 - Snoring': 21,                                          '509 - Fireworks': 33,
+                  '110 - Crow': 9,      '210 - Thunderstorm': 14,     '310 - Drinking': 22,        '410 - Glass breaking': 28,      '510 - Hand saw': 34}
 
     def __init__(self, root, classes, d_type, t_type, transform=None, quantization_scheme=None,
                  augmentation=None, download=False):
@@ -356,9 +371,11 @@ class ESC:
                                               self.augmentation['shift']['max'])
         random_strech_coeff = np.random.uniform(self.augmentation['strech']['min'],
                                                 self.augmentation['strech']['max'])
-
-        aug_audio = tsm.wsola(audio, random_strech_coeff)
-        aug_audio = self.shift(aug_audio, random_shift_time, fs)
+        aug_audio = audio
+        aug_audio = tsm.wsola(aug_audio, random_strech_coeff)
+       # aug_audio = self.shift(aug_audio, random_shift_time, fs)
+      
+        
         aug_audio = self.add_white_noise(aug_audio, random_noise_var_coeff)
         if verbose:
             print(f'random_noise_var_coeff: {random_noise_var_coeff:.2f}\nrandom_shift_time: \
@@ -402,6 +419,7 @@ class ESC:
             data_ex = ESC.expand(data_ex)
             q_data = np.round((data_ex - (-1.0)) / step_size)
             q_data = np.clip(q_data, 0, max_val)
+            
         return np.uint8(q_data)
 
     def __gen_datasets(self, exp_len=16384, row_len=128, overlap_ratio=0):
@@ -426,12 +444,25 @@ class ESC:
             print('------------- Label Size ---------------')
             for i, label in enumerate(labels):
                 record_list = os.listdir(os.path.join(self.raw_folder, label))
+                
+                #!!!!!!!!!!!!!!!!!!!!!!!
+                # test: only pick first in each waveform
+                #record_temp = [d for d in record_list if d.endswith('0.wav')]#  or d.endswith('1.wav')]                
+                #record_list = record_temp
+                
                 print('%8s:  \t%d' % (label, len(record_list)))
+                
+
             print('------------------------------------------')
 
             for i, label in enumerate(labels):
                 print(f'Processing the label: {label}. {i + 1} of {len(labels)}')
                 record_list = sorted(os.listdir(os.path.join(self.raw_folder, label)))
+                
+                #!!!!!!!!!!!!!!!!!!!!!!!
+                # test: only pick first in each waveform
+               # record_temp = [d for d in record_list if d.endswith('0.wav')]# or d.endswith('1.wav')]                
+               # record_list = record_temp
 
                 # dimension: row_length x number_of_rows
                 data_in = np.empty(((self.augmentation['aug_num'] + 1) * len(record_list), row_len,
@@ -478,6 +509,18 @@ class ESC:
                                                    num_bits=self.quantization['bits'],
                                                    compand=self.quantization['compand'],
                                                    mu=self.quantization['mu'])
+                                                   
+                        
+                        # testing waveform
+                        #print(data_in[data_idx,:,:].shape)
+                        #print(f'Max: {np.max(data_in[data_idx,:,:])} Min: {np.min(data_in[data_idx,:,:])}')
+                        #samples = np.sum(data_in,1)/(4*128)
+                        #print(samples.shape)
+                        #for xi in range(128):
+                            #for yi in range(128):
+                         #       bar = '=' * int(samples[data_idx,xi])
+                          #      print(f'{xi}-{bar}')
+                        #exit(0)
 
                 dur = time.time() - time_s
                 print('Done in %.3fsecs.' % dur)
@@ -538,13 +581,25 @@ def ESC_get_datasets(data, load_train=True, load_test=True, num_classes=6):
     ])
 
     if num_classes == 6:
-        classes = ['101-Dog', '102-Rooster', '105-Frog', '106-Cat', '108-Insects', '109-Sheep']
+        classes = ['101 - Dog', '102 - Rooster', '105 - Frog', '106 - Cat', '108 - Insects', '109 - Sheep']
+    
     elif num_classes == 20:
-        classes = ['101-Dog', '102-Rooster', '105-Frog', '106-Cat',
-                   '205-ChirpingBirds', '206-WaterDrops', '210-Thunderstorm', '209-ToiletFlush',
-				           '301-CryingBbaby', '302-Sneezing', '305-Coughing', '307-Laughing',
-				           '401-DoorKnock', '406-WashingMachine', '408-ClockAlarm', '410-GlassBreaking',
-				           '501-Helicopter', '503-Siren', '507-ChurchBells',  '509-Fireworks']				   
+        classes = ['101 - Dog', '102 - Rooster', '104 - Cow', '105 - Frog', '106 - Cat', 
+                   '107 - Hen', '205 - Chirping birds', '109 - Sheep', '110 - Crow', '204 - Crickets',       
+                   '302 - Sneezing', '303 - Clapping', '305 - Coughing', '307 - Laughing', '309 - Snoring',
+                   '401 - Door knock', '408 - Clock alarm', '410 - Glass breaking', '503 - Siren', '509 - Fireworks']
+
+                 # ['101 - Dog', '102 - Rooster', '104 - Cow', '105 - Frog', '106 - Cat', '205 - Chirping birds',
+                 #  '109 - Sheep', '110 - Crow', '302 - Sneezing', '303 - Clapping', '305 - Coughing', 
+                 #  '307 - Laughing', '309 - Snoring', '401 - Door knock', '408 - Clock alarm', '410 - Glass breaking',
+                 #  '501 - Helicopter', '503 - Siren', '507 - Church bells', '508 - Airplane'] 
+                   
+                   #'205-ChirpingBirds', '206-WaterDrops', '210-Thunderstorm', '209-ToiletFlush',
+				           #'301-CryingBbaby', '302-Sneezing', '305-Coughing', '307-Laughing',
+				           #'401-DoorKnock', '406-WashingMachine', '408-ClockAlarm', '410-GlassBreaking',
+				           #'501-Helicopter', '503-Siren', '507-ChurchBells',  '509-Fireworks']			
+                  
+                   	   
     else:
         raise ValueError(f'Unsupported num_classes {num_classes}')
 
